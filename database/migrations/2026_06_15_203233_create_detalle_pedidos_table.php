@@ -12,9 +12,24 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('detalle_pedidos', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+
+    $table->id();
+
+    $table->foreignId('id_pedido')
+        ->constrained('pedidos')
+        ->cascadeOnDelete();
+
+    $table->foreignId('id_producto')
+        ->constrained('productos');
+
+    $table->integer('cantidad');
+
+    $table->decimal('precio_unitario',12,2);
+
+    $table->decimal('subtotal',12,2);
+
+    $table->timestamps();
+});
     }
 
     /**

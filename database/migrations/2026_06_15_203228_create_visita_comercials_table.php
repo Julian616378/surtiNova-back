@@ -12,9 +12,24 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('visita_comercials', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+    $table->id();
+
+    $table->foreignId('id_asesor')
+        ->constrained('usuarios');
+
+    $table->foreignId('id_tienda')
+        ->constrained('tiendas');
+
+    $table->date('fecha');
+
+    $table->text('resultado')->nullable();
+
+    $table->text('observaciones')->nullable();
+
+    $table->date('proxima_visita')->nullable();
+
+    $table->timestamps();
+});
     }
 
     /**

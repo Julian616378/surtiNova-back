@@ -11,10 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ubicacion_repartidors', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+       Schema::create('ubicacion_repartidores', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->foreignId('id_repartidor')
+        ->constrained('usuarios');
+
+    $table->decimal('latitud',10,7);
+
+    $table->decimal('longitud',10,7);
+
+    $table->timestamp('fecha_hora');
+
+    $table->timestamps();
+});
     }
 
     /**

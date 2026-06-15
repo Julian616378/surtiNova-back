@@ -12,9 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('seguimiento_pruebas', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+    $table->id();
+
+    $table->foreignId('id_muestra')
+        ->constrained('muestra_productos');
+
+    $table->integer('cantidad_vendida')->default(0);
+
+    $table->integer('cantidad_devuelta')->default(0);
+
+    $table->decimal('valor_cobrado', 12, 2)->default(0);
+
+    $table->date('fecha');
+
+    $table->text('observaciones')->nullable();
+
+    $table->timestamps();
+});
     }
 
     /**

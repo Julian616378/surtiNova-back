@@ -11,10 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('usuarios', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+       Schema::create('usuarios', function (Blueprint $table) {
+    $table->id();
+    $table->string('nombre');
+    $table->string('apellido');
+    $table->string('correo')->unique();
+    $table->string('telefono');
+    $table->string('password');
+    $table->boolean('estado')->default(true);
+
+    $table->foreignId('id_rol')
+        ->constrained('roles')
+        ->cascadeOnUpdate()
+        ->restrictOnDelete();
+
+    $table->timestamps();
+});
     }
 
     /**

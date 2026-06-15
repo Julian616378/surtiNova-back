@@ -11,10 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('comisions', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+        Schema::create('comisiones', function (Blueprint $table) {
+    $table->id();
+
+    $table->foreignId('id_asesor')
+        ->constrained('usuarios');
+
+    $table->foreignId('id_tienda')
+        ->constrained('tiendas');
+
+    $table->decimal('valor', 12, 2);
+
+    $table->date('fecha');
+
+    $table->enum('estado', [
+        'pendiente',
+        'pagada'
+    ]);
+
+    $table->timestamps();
+});
     }
 
     /**

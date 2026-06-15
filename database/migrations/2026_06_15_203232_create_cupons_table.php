@@ -11,10 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cupons', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+        Schema::create('cupones', function (Blueprint $table) {
+    $table->id();
+
+    $table->string('codigo')->unique();
+
+    $table->decimal('descuento', 12, 2);
+
+    $table->date('fecha_vencimiento');
+
+    $table->integer('usos_maximos');
+
+    $table->boolean('estado')->default(true);
+
+    $table->timestamps();
+});
     }
 
     /**

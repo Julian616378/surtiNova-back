@@ -11,10 +11,30 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('despachos', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+       Schema::create('despachos', function (Blueprint $table) {
+    $table->id();
+
+    $table->foreignId('id_pedido')
+        ->unique()
+        ->constrained('pedidos');
+
+    $table->foreignId('id_bodeguero')
+        ->constrained('usuarios');
+
+    $table->timestamp('fecha_preparacion')
+        ->nullable();
+
+    $table->timestamp('fecha_despacho')
+        ->nullable();
+
+    $table->enum('estado', [
+        'pendiente',
+        'preparando',
+        'despachado'
+    ]);
+
+    $table->timestamps();
+});
     }
 
     /**

@@ -12,9 +12,24 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('facturas', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+    $table->id();
+
+    $table->foreignId('id_pedido')
+        ->unique()
+        ->constrained('pedidos');
+
+    $table->string('numero_factura')->unique();
+
+    $table->decimal('subtotal', 12, 2);
+
+    $table->decimal('iva', 12, 2);
+
+    $table->decimal('total', 12, 2);
+
+    $table->date('fecha');
+
+    $table->timestamps();
+});
     }
 
     /**

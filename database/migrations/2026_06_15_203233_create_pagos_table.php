@@ -12,9 +12,33 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pagos', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+
+    $table->id();
+
+    $table->foreignId('id_pedido')
+        ->constrained('pedidos');
+
+    $table->decimal('monto',12,2);
+
+    $table->enum('metodo_pago',[
+        'efectivo',
+        'nequi',
+        'daviplata',
+        'transferencia',
+        'tarjeta'
+    ]);
+
+    $table->enum('estado',[
+        'pendiente',
+        'pagado',
+        'rechazado',
+        'reembolsado'
+    ]);
+
+    $table->timestamp('fecha_pago')->nullable();
+
+    $table->timestamps();
+});
     }
 
     /**

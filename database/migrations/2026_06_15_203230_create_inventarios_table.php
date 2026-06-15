@@ -12,9 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('inventarios', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+
+    $table->id();
+
+    $table->foreignId('id_producto')
+        ->unique()
+        ->constrained('productos')
+        ->cascadeOnDelete();
+
+    $table->integer('cantidad_actual');
+    $table->integer('cantidad_minima');
+
+    $table->timestamps();
+});
     }
 
     /**

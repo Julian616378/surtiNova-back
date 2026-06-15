@@ -12,9 +12,29 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('muestra_productos', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+    $table->id();
+
+    $table->foreignId('id_tienda')
+        ->constrained('tiendas');
+
+    $table->foreignId('id_producto')
+        ->constrained('productos');
+
+    $table->integer('cantidad');
+
+    $table->date('fecha_entrega');
+
+    $table->date('fecha_revision')->nullable();
+
+    $table->enum('estado', [
+        'entregado',
+        'vendido',
+        'devuelto',
+        'perdido'
+    ]);
+
+    $table->timestamps();
+});
     }
 
     /**

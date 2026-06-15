@@ -11,10 +11,30 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ofertas', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+       Schema::create('ofertas', function (Blueprint $table) {
+    $table->id();
+
+    $table->string('nombre');
+
+    $table->text('descripcion')->nullable();
+
+    $table->enum('tipo', [
+        'porcentaje',
+        'valor_fijo',
+        'combo',
+        'dos_por_uno'
+    ]);
+
+    $table->decimal('valor', 12, 2);
+
+    $table->date('fecha_inicio');
+
+    $table->date('fecha_fin');
+
+    $table->boolean('estado')->default(true);
+
+    $table->timestamps();
+});
     }
 
     /**

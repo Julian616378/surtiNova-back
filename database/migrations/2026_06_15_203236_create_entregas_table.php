@@ -12,9 +12,26 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('entregas', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+    $table->id();
+
+    $table->foreignId('id_pedido')
+        ->unique()
+        ->constrained('pedidos');
+
+    $table->timestamp('fecha_entrega')
+        ->nullable();
+
+    $table->string('foto_evidencia')
+        ->nullable();
+
+    $table->text('firma_cliente')
+        ->nullable();
+
+    $table->text('observaciones')
+        ->nullable();
+
+    $table->timestamps();
+});
     }
 
     /**

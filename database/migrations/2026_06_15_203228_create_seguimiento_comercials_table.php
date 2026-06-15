@@ -12,9 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('seguimiento_comercials', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+    $table->id();
+
+    $table->foreignId('id_tienda')
+        ->constrained('tiendas');
+
+    $table->foreignId('id_asesor')
+        ->constrained('usuarios');
+
+    $table->date('fecha');
+
+    $table->text('observacion');
+
+    $table->string('estado');
+
+    $table->timestamps();
+});
     }
 
     /**

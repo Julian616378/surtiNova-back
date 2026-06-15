@@ -11,10 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notificacions', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+        Schema::create('notificaciones', function (Blueprint $table) {
+    $table->id();
+
+    $table->foreignId('id_usuario')
+        ->constrained('usuarios');
+
+    $table->string('titulo');
+
+    $table->text('mensaje');
+
+    $table->boolean('leida')
+        ->default(false);
+
+    $table->timestamps();
+});
     }
 
     /**
