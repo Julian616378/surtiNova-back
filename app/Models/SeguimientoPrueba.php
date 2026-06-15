@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class SeguimientoPrueba extends Model
 {
-    /** @use HasFactory<\Database\Factories\SeguimientoPruebaFactory> */
-    use HasFactory;
+    protected $table = 'seguimiento_pruebas';
+
+    public function muestra()
+    {
+        return $this->belongsTo(MuestraProducto::class, 'id_muestra');
+    }
 }

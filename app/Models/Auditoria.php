@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Auditoria extends Model
 {
-    /** @use HasFactory<\Database\Factories\AuditoriaFactory> */
-    use HasFactory;
+    protected $table = 'auditorias';
+
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class, 'id_usuario');
+    }
 }

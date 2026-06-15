@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Entrega extends Model
 {
-    /** @use HasFactory<\Database\Factories\EntregaFactory> */
-    use HasFactory;
+    public function pedido()
+    {
+        return $this->belongsTo(Pedido::class, 'id_pedido');
+    }
 }

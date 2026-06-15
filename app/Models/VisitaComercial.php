@@ -7,6 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class VisitaComercial extends Model
 {
-    /** @use HasFactory<\Database\Factories\VisitaComercialFactory> */
-    use HasFactory;
+    protected $table = 'visita_comerciales';
+
+    public function asesor()
+    {
+        return $this->belongsTo(Usuario::class, 'id_asesor');
+    }
+
+    public function tienda()
+    {
+        return $this->belongsTo(Tienda::class, 'id_tienda');
+    }
 }

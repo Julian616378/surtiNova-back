@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Inventario extends Model
 {
-    /** @use HasFactory<\Database\Factories\InventarioFactory> */
-    use HasFactory;
+    public function producto()
+    {
+        return $this->belongsTo(Producto::class, 'id_producto');
+    }
 }

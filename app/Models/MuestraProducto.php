@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class MuestraProducto extends Model
 {
-    /** @use HasFactory<\Database\Factories\MuestraProductoFactory> */
-    use HasFactory;
+    public function tienda()
+    {
+        return $this->belongsTo(Tienda::class, 'id_tienda');
+    }
+
+    public function producto()
+    {
+        return $this->belongsTo(Producto::class, 'id_producto');
+    }
 }

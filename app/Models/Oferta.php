@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Oferta extends Model
 {
-    /** @use HasFactory<\Database\Factories\OfertaFactory> */
-    use HasFactory;
+    public function productos()
+    {
+        return $this->belongsToMany(
+            Producto::class,
+            'oferta_producto',
+            'id_oferta',
+            'id_producto'
+        );
+    }
 }

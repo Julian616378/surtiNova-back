@@ -7,6 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class UbicacionRepartidor extends Model
 {
-    /** @use HasFactory<\Database\Factories\UbicacionRepartidorFactory> */
-    use HasFactory;
+    protected $table = 'ubicacion_repartidores';
+
+    protected $fillable = [
+        'id_repartidor',
+        'latitud',
+        'longitud',
+        'fecha_hora'
+    ];
+
+    public function repartidor()
+    {
+        return $this->belongsTo(Usuario::class, 'id_repartidor');
+    }
 }

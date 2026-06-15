@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Notificacion extends Model
 {
-    /** @use HasFactory<\Database\Factories\NotificacionFactory> */
-    use HasFactory;
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class, 'id_usuario');
+    }
 }

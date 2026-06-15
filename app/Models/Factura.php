@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Factura extends Model
 {
-    /** @use HasFactory<\Database\Factories\FacturaFactory> */
-    use HasFactory;
+    public function pedido()
+    {
+        return $this->belongsTo(Pedido::class, 'id_pedido');
+    }
 }

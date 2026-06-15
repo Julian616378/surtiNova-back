@@ -7,6 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ruta extends Model
 {
-    /** @use HasFactory<\Database\Factories\RutaFactory> */
-    use HasFactory;
+    public function repartidor()
+    {
+        return $this->belongsTo(Usuario::class, 'id_repartidor');
+    }
+
+    public function pedidos()
+    {
+        return $this->belongsToMany(
+            Pedido::class,
+            'pedido_ruta',
+            'id_ruta',
+            'id_pedido'
+        );
+    }
 }

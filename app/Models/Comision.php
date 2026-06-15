@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Comision extends Model
 {
-    /** @use HasFactory<\Database\Factories\ComisionFactory> */
-    use HasFactory;
+    public function asesor()
+    {
+        return $this->belongsTo(Usuario::class, 'id_asesor');
+    }
+
+    public function tienda()
+    {
+        return $this->belongsTo(Tienda::class, 'id_tienda');
+    }
 }
