@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UsuarioController;
 use App\Http\Controllers\Api\CategoriaController;
@@ -23,6 +25,13 @@ use App\Http\Controllers\Api\NotificacionController;
 use App\Http\Controllers\Api\ComisionController;
 use App\Http\Controllers\Api\AuditoriaController;
 use App\Http\Controllers\Api\DashboardController;
+
+
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
+
+
 
 /*
 |--------------------------------------------------------------------------
