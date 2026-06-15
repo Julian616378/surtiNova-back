@@ -3,10 +3,38 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
-class Usuario extends Model
+class Usuario extends Authenticatable
 {
+    use HasApiTokens, HasFactory;
+
+    protected $table = 'usuarios';
+
+    protected $fillable = [
+        'nombre',
+        'apellido',
+        'correo',
+        'telefono',
+        'password',
+        'estado',
+        'id_rol',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'estado' => 'boolean',
+            'password' => 'hashed',
+        ];
+    }
+
     public function rol()
     {
         return $this->belongsTo(Rol::class, 'id_rol');
