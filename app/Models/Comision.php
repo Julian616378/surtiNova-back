@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Comision extends Model
 {
+    protected $table = 'comisiones';
     public function asesor()
     {
         return $this->belongsTo(Usuario::class, 'id_asesor');

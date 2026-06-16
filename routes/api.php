@@ -39,6 +39,7 @@ use App\Http\Controllers\Api\DashboardController;
 // RUTAS PÚBLICAS (sin autenticación)
 // ─────────────────────────────────────────────────────────────────────────────
 
+Route::post('/usuarios', [UsuarioController::class, 'store']);
 Route::post('/login',            [AuthController::class, 'login']);
 Route::post('/cupones/validar',  [CuponController::class, 'validar']);
 

@@ -16,17 +16,17 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|email',
+            'correo'    => 'required|email',
             'password' => 'required|string',
         ]);
 
         $usuario = Usuario::with('rol')
-            ->where('email', $request->email)
+            ->where('correo', $request->correo)
             ->first();
 
         if (! $usuario || ! Hash::check($request->password, $usuario->password)) {
             throw ValidationException::withMessages([
-                'email' => ['Credenciales incorrectas.'],
+                'correo' => ['Credenciales incorrectas.'],
             ]);
         }
 
@@ -37,7 +37,7 @@ class AuthController extends Controller
             'usuario' => [
                 'id'     => $usuario->id,
                 'nombre' => $usuario->nombre,
-                'email'  => $usuario->email,
+                'correo'  => $usuario->correo,
                 'rol'    => $usuario->rol?->nombre,
             ],
         ]);
