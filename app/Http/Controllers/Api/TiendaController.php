@@ -52,27 +52,39 @@ class TiendaController extends Controller
      * Registrar tienda formal (paso 2 - cuando el prospecto acepta)
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'razon_social'   => 'required|string|max:255',
-            'nit'            => 'required|string|unique:tiendas,nit',
-            'propietario'    => 'required|string|max:255',
-            'telefono'       => 'required|string|max:20',
-            'email'          => 'required|email|unique:tiendas,email',
-            'direccion'      => 'required|string',
-            'latitud'        => 'nullable|numeric',
-            'longitud'       => 'nullable|numeric',
-            'id_asesor'      => 'nullable|exists:usuarios,id',
-        ]);
+{
+    $request->validate([
+        'nombre'       => 'required|string|max:255',
+        'nit'          => 'nullable|string|unique:tiendas,nit',
+        'propietario'  => 'required|string|max:255',
+        'telefono'     => 'required|string|max:20',
+        'correo'       => 'nullable|email|unique:tiendas,correo',
+        'direccion'    => 'required|string',
+        'latitud'      => 'nullable|numeric',
+        'longitud'     => 'nullable|numeric',
+        'id_asesor'    => 'required|exists:usuarios,id',
+    ]);
 
-        $tienda = Tienda::create(array_merge(
-            $request->only('razon_social', 'nit', 'propietario', 'telefono', 'email', 'direccion', 'latitud', 'longitud', 'id_asesor'),
-            ['estado' => 'registrada']
-        ));
+    $tienda = Tienda::create(array_merge(
+        $request->only(
+            'nombre',
+            'nit',
+            'propietario',
+            'telefono',
+            'correo',
+            'direccion',
+            'latitud',
+            'longitud',
+            'id_asesor'
+        ),
+        ['estado' => 'registrada']
+    ));
 
-        return response()->json($tienda->load('asesor'), 201);
-    }
-
+    return response()->json(
+        $tienda->load('asesor'),
+        201
+    );
+}
     public function show(Tienda $tienda)
     {
         return response()->json($tienda->load(['asesor', 'pedidos', 'muestras']));
@@ -84,13 +96,13 @@ class TiendaController extends Controller
             'razon_social' => 'sometimes|string|max:255',
             'propietario'  => 'sometimes|string|max:255',
             'telefono'     => 'sometimes|string|max:20',
-            'email'        => "sometimes|email|unique:tiendas,email,{$tienda->id}",
+            'correo'        => "sometimes|email|unique:tiendas,correo,{$tienda->id}",
             'direccion'    => 'sometimes|string',
             'latitud'      => 'nullable|numeric',
             'longitud'     => 'nullable|numeric',
         ]);
 
-        $tienda->update($request->only('razon_social', 'propietario', 'telefono', 'email', 'direccion', 'latitud', 'longitud'));
+        $tienda->update($request->only('razon_social', 'propietario', 'telefono', 'correo', 'direccion', 'latitud', 'longitud'));
 
         return response()->json($tienda);
     }

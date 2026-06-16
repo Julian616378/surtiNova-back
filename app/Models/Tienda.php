@@ -7,6 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tienda extends Model
 {
+    protected $fillable = [
+    'nombre',
+    'nit',
+    'propietario',
+    'telefono',
+    'correo',
+    'direccion',
+    'latitud',
+    'longitud',
+    'estado',
+    'id_asesor',
+];
     public function asesor()
     {
         return $this->belongsTo(Usuario::class, 'id_asesor');
