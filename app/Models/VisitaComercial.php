@@ -7,7 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class VisitaComercial extends Model
 {
-    protected $table = 'visita_comerciales';
+    protected $fillable = [
+    'id_asesor',
+    'id_tienda',
+    'fecha',
+    'resultado',
+    'observaciones',
+    'proxima_visita',
+];
+    protected $table = 'visita_comercials';
 
     public function asesor()
     {

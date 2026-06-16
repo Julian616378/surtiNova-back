@@ -8,64 +8,56 @@ use Illuminate\Http\Request;
 
 class VisitaComercialController extends Controller
 {
-    /**
-     * Visitas del asesor autenticado
-     */
+
     public function index(Request $request)
-    {
-        $visitas = VisitaComercial::with('tienda')
-            ->where('id_asesor', $request->user()->id)
-            ->orderByDesc('fecha_programada')
-            ->paginate(20);
+{
+    $visitas = VisitaComercial::with('tienda')
+        ->where('id_asesor', $request->user()->id)
+        ->orderByDesc('fecha')
+        ->paginate(20);
 
-        return response()->json($visitas);
-    }
+    return response()->json($visitas);
+}
 
-    /**
-     * Programar visita
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'id_tienda'        => 'required|exists:tiendas,id',
-            'fecha_programada' => 'required|date',
-            'objetivo'         => 'nullable|string',
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'id_tienda'       => 'required|exists:tiendas,id',
+        'fecha'           => 'required|date',
+        'proxima_visita'  => 'nullable|date|after:fecha',
+        'observaciones'   => 'nullable|string',
+    ]);
 
-        $visita = VisitaComercial::create([
-            'id_asesor'        => $request->user()->id,
-            'id_tienda'        => $request->id_tienda,
-            'fecha_programada' => $request->fecha_programada,
-            'objetivo'         => $request->objetivo,
-            'estado'           => 'programada',
-        ]);
+    $visita = VisitaComercial::create([
+        'id_asesor'       => $request->user()->id,
+        'id_tienda'       => $request->id_tienda,
+        'fecha'           => $request->fecha,
+        'proxima_visita'  => $request->proxima_visita,
+        'observaciones'   => $request->observaciones,
+    ]);
 
-        return response()->json($visita->load('tienda'), 201);
-    }
+    return response()->json($visita->load('tienda'), 201);
+}
 
-    /**
-     * Registrar resultado de visita
-     */
-    public function registrarResultado(Request $request, VisitaComercial $visita)
-    {
-        $request->validate([
-            'resultado'       => 'required|string',
-            'fecha_realizada' => 'required|date',
-            'observaciones'   => 'nullable|string',
-        ]);
+public function show(VisitaComercial $visita)
+{
+    return response()->json($visita->load(['asesor', 'tienda']));
+}
 
-        $visita->update([
-            'resultado'       => $request->resultado,
-            'fecha_realizada' => $request->fecha_realizada,
-            'observaciones'   => $request->observaciones,
-            'estado'          => 'realizada',
-        ]);
+public function registrarResultado(Request $request, VisitaComercial $visita)
+{
+    $request->validate([
+        'resultado'      => 'required|string',
+        'observaciones'  => 'nullable|string',
+        'proxima_visita' => 'nullable|date',
+    ]);
 
-        return response()->json($visita);
-    }
+    $visita->update([
+        'resultado'      => $request->resultado,
+        'observaciones'  => $request->observaciones,
+        'proxima_visita' => $request->proxima_visita,
+    ]);
 
-    public function show(VisitaComercial $visita)
-    {
-        return response()->json($visita->load(['asesor', 'tienda']));
-    }
+    return response()->json($visita);
+}
 }
