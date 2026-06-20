@@ -7,7 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Auditoria extends Model
 {
+    use HasFactory;
+
     protected $table = 'auditorias';
+
+    protected $fillable = [
+        'id_usuario',
+        'accion',
+        'tabla_afectada',
+        'ip',
+    ];
 
     public function usuario()
     {

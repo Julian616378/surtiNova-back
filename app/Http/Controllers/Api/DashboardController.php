@@ -33,7 +33,7 @@ class DashboardController extends Controller
 
         $pedidosHoy = Pedido::whereDate('fecha_pedido', $hoy)->count();
 
-        $tiendasActivas = Tienda::where('estado', 'activa')->count();
+        $tiendasActivas  = Tienda::where('estado', 'activa')->count();
         $tiendasEnPrueba = Tienda::where('estado', 'en_prueba')->count();
 
         $repartidoresActivos = Ruta::where('estado', 'en_curso')
@@ -108,9 +108,9 @@ class DashboardController extends Controller
             ->get();
 
         $resumen = [
-            'total_pedidos'  => $ventas->count(),
-            'total_ingresos' => $ventas->sum('total'),
-            'promedio_pedido'=> $ventas->avg('total'),
+            'total_pedidos'   => $ventas->count(),
+            'total_ingresos'  => $ventas->sum('total'),
+            'promedio_pedido' => $ventas->avg('total'),
         ];
 
         return response()->json(['resumen' => $resumen, 'pedidos' => $ventas]);
@@ -168,12 +168,13 @@ class DashboardController extends Controller
             ->where('estado', 'activa')
             ->get()
             ->map(fn($t) => [
-                'id'              => $t->id,
-                'razon_social'    => $t->razon_social,
-                'asesor'          => $t->asesor?->nombre,
-                'total_pedidos'   => $t->pedidos->count(),
-                'total_compras'   => $t->pedidos->sum('total'),
-                'ultimo_pedido'   => $t->pedidos->max('fecha_pedido'),
+                'id'            => $t->id,
+                'nombre'        => $t->nombre,
+                'propietario'   => $t->propietario,
+                'asesor'        => $t->asesor?->nombre,
+                'total_pedidos' => $t->pedidos->count(),
+                'total_compras' => $t->pedidos->sum('total'),
+                'ultimo_pedido' => $t->pedidos->max('fecha_pedido'),
             ]);
 
         return response()->json($tiendas);

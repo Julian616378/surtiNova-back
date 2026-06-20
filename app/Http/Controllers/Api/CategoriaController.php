@@ -18,10 +18,9 @@ class CategoriaController extends Controller
         $request->validate([
             'nombre'      => 'required|string|max:255|unique:categorias,nombre',
             'descripcion' => 'nullable|string',
-            'estado'      => 'sometimes|boolean',
         ]);
 
-        $categoria = Categoria::create($request->only('nombre', 'descripcion', 'estado'));
+        $categoria = Categoria::create($request->only('nombre', 'descripcion'));
 
         return response()->json($categoria, 201);
     }
@@ -36,17 +35,16 @@ class CategoriaController extends Controller
         $request->validate([
             'nombre'      => "sometimes|string|max:255|unique:categorias,nombre,{$categoria->id}",
             'descripcion' => 'nullable|string',
-            'estado'      => 'sometimes|boolean',
         ]);
 
-        $categoria->update($request->only('nombre', 'descripcion', 'estado'));
+        $categoria->update($request->only('nombre', 'descripcion'));
 
         return response()->json($categoria);
     }
 
     public function destroy(Categoria $categoria)
     {
-        $categoria->update(['estado' => false]);
-        return response()->json(['message' => 'Categoría desactivada.']);
+        $categoria->delete();
+        return response()->json(['message' => 'Categoría eliminada.']);
     }
 }

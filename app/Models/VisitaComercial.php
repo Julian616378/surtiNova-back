@@ -7,15 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class VisitaComercial extends Model
 {
-    protected $fillable = [
-    'id_asesor',
-    'id_tienda',
-    'fecha',
-    'resultado',
-    'observaciones',
-    'proxima_visita',
-];
+    use HasFactory;
+
     protected $table = 'visita_comercials';
+
+    protected $fillable = [
+        'id_asesor',
+        'id_tienda',
+        'fecha',
+        'resultado',
+        'observaciones',
+        'proxima_visita',
+    ];
+
+    protected $casts = [
+        'fecha'          => 'date',
+        'proxima_visita' => 'date',
+    ];
 
     public function asesor()
     {

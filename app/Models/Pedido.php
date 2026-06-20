@@ -7,6 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pedido extends Model
 {
+    use HasFactory;
+
+    protected $table = 'pedidos';
+
+    protected $fillable = [
+        'id_tienda',
+        'fecha_pedido',
+        'fecha_estimada',
+        'estado',
+        'subtotal',
+        'descuento',
+        'total',
+    ];
+
+    protected $casts = [
+        'fecha_pedido'  => 'datetime',
+        'fecha_estimada' => 'datetime',
+        'subtotal'      => 'decimal:2',
+        'descuento'     => 'decimal:2',
+        'total'         => 'decimal:2',
+    ];
+
     public function tienda()
     {
         return $this->belongsTo(Tienda::class, 'id_tienda');

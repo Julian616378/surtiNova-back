@@ -7,7 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class SeguimientoComercial extends Model
 {
-    protected $table = 'seguimiento_comerciales';
+    use HasFactory;
+
+    protected $table = 'seguimiento_comercials';
+
+    protected $fillable = [
+        'id_tienda',
+        'id_asesor',
+        'fecha',
+        'observacion',
+        'estado',
+    ];
+
+    protected $casts = [
+        'fecha' => 'date',
+    ];
 
     public function asesor()
     {

@@ -32,17 +32,17 @@ class PedidoController extends Controller
     }
 
     /**
-     * Crear pedido (Tienda autenticada)
-     * Recibe: items[], id_cupon opcional
+     * Crear pedido
+     * Recibe: items[], codigo_cupon opcional
      */
     public function store(Request $request)
     {
         $request->validate([
-            'id_tienda'      => 'required|exists:tiendas,id',
-            'items'          => 'required|array|min:1',
+            'id_tienda'           => 'required|exists:tiendas,id',
+            'items'               => 'required|array|min:1',
             'items.*.id_producto' => 'required|exists:productos,id',
             'items.*.cantidad'    => 'required|integer|min:1',
-            'codigo_cupon'   => 'nullable|string|exists:cupones,codigo',
+            'codigo_cupon'        => 'nullable|string|exists:cupones,codigo',
         ]);
 
         return DB::transaction(function () use ($request) {
@@ -50,7 +50,6 @@ class PedidoController extends Controller
             $descuento = 0;
             $detalles  = [];
 
-            // Calcular subtotal y validar stock
             foreach ($request->items as $item) {
                 $producto = Producto::findOrFail($item['id_producto']);
 
@@ -63,15 +62,14 @@ class PedidoController extends Controller
                 $lineaSubtotal = $producto->precio * $item['cantidad'];
                 $subtotal     += $lineaSubtotal;
                 $detalles[]    = [
-                    'id_producto'    => $producto->id,
-                    'cantidad'       => $item['cantidad'],
-                    'precio_unitario'=> $producto->precio,
-                    'subtotal'       => $lineaSubtotal,
+                    'id_producto'     => $producto->id,
+                    'cantidad'        => $item['cantidad'],
+                    'precio_unitario' => $producto->precio,
+                    'subtotal'        => $lineaSubtotal,
                 ];
             }
 
             // Aplicar cupón si existe
-            $idCupon = null;
             if ($request->codigo_cupon) {
                 $cupon = Cupon::where('codigo', $request->codigo_cupon)
                     ->where('estado', true)
@@ -80,13 +78,12 @@ class PedidoController extends Controller
 
                 if ($cupon) {
                     $descuento = $cupon->descuento;
-                    $idCupon   = $cupon->id;
                 }
             }
 
             $total = max(0, $subtotal - $descuento);
 
-            // Crear pedido
+            // Crear pedido (sin id_cupon, campo no existe en la tabla)
             $pedido = Pedido::create([
                 'id_tienda'    => $request->id_tienda,
                 'fecha_pedido' => now(),
@@ -94,7 +91,6 @@ class PedidoController extends Controller
                 'subtotal'     => $subtotal,
                 'descuento'    => $descuento,
                 'total'        => $total,
-                'id_cupon'     => $idCupon,
             ]);
 
             // Insertar detalles y descontar stock
@@ -102,11 +98,9 @@ class PedidoController extends Controller
                 $detalle['id_pedido'] = $pedido->id;
                 DetallePedido::create($detalle);
 
-                // Descontar stock
                 Producto::where('id', $detalle['id_producto'])->decrement('stock', $detalle['cantidad']);
                 Inventario::where('id_producto', $detalle['id_producto'])->decrement('cantidad_actual', $detalle['cantidad']);
 
-                // Registrar movimiento
                 MovimientoInventario::create([
                     'id_producto' => $detalle['id_producto'],
                     'tipo'        => 'salida',
@@ -116,7 +110,7 @@ class PedidoController extends Controller
                 ]);
             }
 
-            // Notificar a la tienda
+            // Notificar al usuario autenticado
             Notificacion::create([
                 'id_usuario' => $request->user()->id,
                 'titulo'     => 'Pedido recibido',
@@ -154,21 +148,20 @@ class PedidoController extends Controller
 
         $pedido->update(['estado' => $request->estado]);
 
-        // Notificar cambio de estado a la tienda
         $mensajes = [
-            'preparando'  => "Tu pedido #{$pedido->id} está siendo preparado.",
-            'despachado'  => "Tu pedido #{$pedido->id} salió de bodega.",
-            'en_ruta'     => "Tu pedido #{$pedido->id} está en camino, ¡pronto llegará!",
-            'entregado'   => "Tu pedido #{$pedido->id} fue entregado. ¡Gracias por tu compra!",
-            'cancelado'   => "Tu pedido #{$pedido->id} fue cancelado.",
+            'preparando' => "Tu pedido #{$pedido->id} está siendo preparado.",
+            'despachado' => "Tu pedido #{$pedido->id} salió de bodega.",
+            'en_ruta'    => "Tu pedido #{$pedido->id} está en camino, ¡pronto llegará!",
+            'entregado'  => "Tu pedido #{$pedido->id} fue entregado. ¡Gracias por tu compra!",
+            'cancelado'  => "Tu pedido #{$pedido->id} fue cancelado.",
         ];
 
         if (isset($mensajes[$request->estado])) {
-            // Notificar al usuario de la tienda
             $tienda = $pedido->tienda;
-            if ($tienda && $tienda->id_usuario) {
+            // Notificar al asesor de la tienda (id_asesor es el campo correcto en tiendas)
+            if ($tienda && $tienda->id_asesor) {
                 Notificacion::create([
-                    'id_usuario' => $tienda->id_usuario,
+                    'id_usuario' => $tienda->id_asesor,
                     'titulo'     => 'Actualización de pedido',
                     'mensaje'    => $mensajes[$request->estado],
                 ]);
@@ -188,7 +181,6 @@ class PedidoController extends Controller
         }
 
         DB::transaction(function () use ($pedido) {
-            // Revertir stock
             foreach ($pedido->detalles as $detalle) {
                 Producto::where('id', $detalle->id_producto)->increment('stock', $detalle->cantidad);
                 Inventario::where('id_producto', $detalle->id_producto)->increment('cantidad_actual', $detalle->cantidad);
@@ -206,7 +198,7 @@ class PedidoController extends Controller
     public function misPedidos(Request $request)
     {
         $pedidos = Pedido::with(['detalles.producto', 'pagos'])
-            ->where('id_tienda', $request->tienda_id) // viene del middleware de tienda
+            ->where('id_tienda', $request->tienda_id)
             ->orderByDesc('fecha_pedido')
             ->paginate(15);
 

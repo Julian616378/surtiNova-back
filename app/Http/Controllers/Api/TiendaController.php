@@ -17,8 +17,8 @@ class TiendaController extends Controller
             ->when($request->estado, fn($q) => $q->where('estado', $request->estado))
             ->when($request->asesor, fn($q) => $q->where('id_asesor', $request->asesor))
             ->when($request->buscar, fn($q) => $q->where(function ($q2) use ($request) {
-                $q2->where('razon_social', 'like', "%{$request->buscar}%")
-                   ->orWhere('nombre_propietario', 'like', "%{$request->buscar}%");
+                $q2->where('nombre', 'like', "%{$request->buscar}%")
+                   ->orWhere('propietario', 'like', "%{$request->buscar}%");
             }))
             ->paginate(20);
 
@@ -28,8 +28,48 @@ class TiendaController extends Controller
     /**
      * Registrar prospecto (paso 1)
      */
-    
+    public function registrarProspecto(Request $request)
+    {
+        $request->validate([
+            'nombre'      => 'required|string|max:255',
+            'propietario' => 'required|string|max:255',
+            'telefono'    => 'required|string|max:20',
+            'direccion'   => 'required|string',
+            'correo'      => 'nullable|email|max:255',
+        ]);
 
+        $tienda = Tienda::create(array_merge(
+            $request->only('nombre', 'propietario', 'telefono', 'direccion', 'correo'),
+            [
+                'estado'    => 'prospecto',
+                'id_asesor' => $request->user()->id,
+            ]
+        ));
+
+        return response()->json($tienda, 201);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nombre'      => 'required|string|max:255',
+            'nit'         => 'nullable|string|unique:tiendas,nit',
+            'propietario' => 'required|string|max:255',
+            'telefono'    => 'required|string|max:20',
+            'correo'      => 'nullable|email|unique:tiendas,correo',
+            'direccion'   => 'required|string',
+            'latitud'     => 'nullable|numeric',
+            'longitud'    => 'nullable|numeric',
+            'id_asesor'   => 'nullable|exists:usuarios,id',
+        ]);
+
+        $tienda = Tienda::create(array_merge(
+            $request->only('nombre', 'nit', 'propietario', 'telefono', 'correo', 'direccion', 'latitud', 'longitud', 'id_asesor'),
+            ['estado' => 'registrada']
+        ));
+
+        return response()->json($tienda->load('asesor'), 201);
+    }
 
     public function cambiarEstado(Request $request, Tienda $tienda)
     {
@@ -61,95 +101,34 @@ class TiendaController extends Controller
         return response()->json($pedidos);
     }
 
+    public function misCartera(Request $request)
+    {
+        $tiendas = Tienda::where('id_asesor', $request->user()->id)
+            ->with(['pedidos' => fn($q) => $q->latest()->limit(1)])
+            ->get();
 
+        return response()->json($tiendas);
+    }
 
+    public function show(Tienda $tienda)
+    {
+        return response()->json($tienda->load(['asesor', 'pedidos', 'muestras']));
+    }
 
+    public function update(Request $request, Tienda $tienda)
+    {
+        $request->validate([
+            'nombre'      => 'sometimes|string|max:255',
+            'propietario' => 'sometimes|string|max:255',
+            'telefono'    => 'sometimes|string|max:20',
+            'correo'      => "sometimes|email|unique:tiendas,correo,{$tienda->id}",
+            'direccion'   => 'sometimes|string',
+            'latitud'     => 'nullable|numeric',
+            'longitud'    => 'nullable|numeric',
+        ]);
 
+        $tienda->update($request->only('nombre', 'propietario', 'telefono', 'correo', 'direccion', 'latitud', 'longitud'));
 
-
-    public function registrarProspecto(Request $request)
-{
-    $request->validate([
-        'nombre'        => 'required|string|max:255',
-        'propietario'   => 'required|string|max:255',
-        'telefono'      => 'required|string|max:20',
-        'direccion'     => 'required|string',
-        'correo'        => 'nullable|email|max:255',
-    ]);
-
-    $tienda = Tienda::create(array_merge(
-        $request->only('nombre', 'propietario', 'telefono', 'direccion', 'correo'),
-        [
-            'estado'    => 'prospecto',
-            'id_asesor' => $request->user()->id,
-        ]
-    ));
-
-    return response()->json($tienda, 201);
+        return response()->json($tienda);
+    }
 }
-
-public function store(Request $request)
-{
-    $request->validate([
-        'nombre'      => 'required|string|max:255',
-        'nit'         => 'nullable|string|unique:tiendas,nit',
-        'propietario' => 'required|string|max:255',
-        'telefono'    => 'required|string|max:20',
-        'correo'      => 'nullable|email|unique:tiendas,correo',
-        'direccion'   => 'required|string',
-        'latitud'     => 'nullable|numeric',
-        'longitud'    => 'nullable|numeric',
-        'id_asesor'   => 'nullable|exists:usuarios,id',
-    ]);
-
-    $tienda = Tienda::create(array_merge(
-        $request->only('nombre', 'nit', 'propietario', 'telefono', 'correo', 'direccion', 'latitud', 'longitud', 'id_asesor'),
-        ['estado' => 'registrada']
-    ));
-
-    return response()->json($tienda->load('asesor'), 201);
-}
-
-public function misCartera(Request $request)
-{
-    $tiendas = Tienda::where('id_asesor', $request->user()->id)
-        ->with(['pedidos' => fn($q) => $q->latest()->limit(1)])
-        ->get();
-
-    return response()->json($tiendas);
-}
-
-public function show(Tienda $tienda)
-{
-    return response()->json($tienda->load(['asesor', 'pedidos', 'muestras']));
-}
-
-public function update(Request $request, Tienda $tienda)
-{
-    $request->validate([
-        'nombre'      => 'sometimes|string|max:255',
-        'propietario' => 'sometimes|string|max:255',
-        'telefono'    => 'sometimes|string|max:20',
-        'correo'      => "sometimes|email|unique:tiendas,correo,{$tienda->id}",
-        'direccion'   => 'sometimes|string',
-        'latitud'     => 'nullable|numeric',
-        'longitud'    => 'nullable|numeric',
-    ]);
-
-    $tienda->update($request->only('nombre', 'propietario', 'telefono', 'correo', 'direccion', 'latitud', 'longitud'));
-
-    return response()->json($tienda);
-}
-}
-
-
-
-
-
-
-
-
-
-
-
-

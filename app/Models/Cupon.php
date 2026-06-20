@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,7 +16,7 @@ class Cupon extends Model
         'descuento',
         'fecha_vencimiento',
         'usos_maximos',
-        'estado'
+        'estado',
     ];
 
     protected $casts = [
@@ -25,12 +24,4 @@ class Cupon extends Model
         'fecha_vencimiento' => 'date',
         'estado' => 'boolean',
     ];
-
-    /**
-     * Pedidos que utilizaron este cupón
-     */
-    public function pedidos()
-    {
-        return $this->hasMany(Pedido::class, 'id_cupon');
-    }
 }

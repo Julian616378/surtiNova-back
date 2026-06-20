@@ -7,7 +7,6 @@ use App\Models\Entrega;
 use App\Models\Pedido;
 use App\Models\Notificacion;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class EntregaController extends Controller
 {
@@ -18,8 +17,8 @@ class EntregaController extends Controller
     {
         $request->validate([
             'id_pedido'      => 'required|exists:pedidos,id|unique:entregas,id_pedido',
-            'foto_evidencia' => 'nullable|string', // base64 o URL desde Flutter
-            'firma_cliente'  => 'nullable|string', // base64 de firma digital
+            'foto_evidencia' => 'nullable|string',
+            'firma_cliente'  => 'nullable|string',
             'observaciones'  => 'nullable|string',
         ]);
 
@@ -36,12 +35,12 @@ class EntregaController extends Controller
         // Actualizar estado del pedido
         $pedido->update(['estado' => 'entregado']);
 
-        // Notificar a la tienda
-        if ($pedido->tienda && $pedido->tienda->id_usuario) {
+        // Notificar al asesor de la tienda
+        if ($pedido->tienda && $pedido->tienda->id_asesor) {
             Notificacion::create([
-                'id_usuario' => $pedido->tienda->id_usuario,
+                'id_usuario' => $pedido->tienda->id_asesor,
                 'titulo'     => '¡Pedido entregado!',
-                'mensaje'    => "Tu pedido #{$pedido->id} fue entregado exitosamente.",
+                'mensaje'    => "El pedido #{$pedido->id} fue entregado exitosamente.",
             ]);
         }
 
