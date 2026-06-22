@@ -21,4 +21,7 @@ class Inventario extends Model
     {
         return $this->belongsTo(Producto::class, 'id_producto');
     }
+
+
+
 }
