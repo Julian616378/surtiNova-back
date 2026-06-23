@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\UbicacionController;
 use App\Http\Controllers\Api\NotificacionController;
 use App\Http\Controllers\Api\ComisionController;
 use App\Http\Controllers\Api\AuditoriaController;
+use App\Http\Controllers\Api\CarritoController;
 use App\Http\Controllers\Api\DashboardController;
 
 /*
@@ -262,4 +263,25 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('auditorias',                    [AuditoriaController::class, 'index']);
         Route::get('auditorias/{auditoria}',        [AuditoriaController::class, 'show']);
     });
+});
+Route::prefix('carrito')->middleware('auth:sanctum')->group(function () {
+ 
+    // Ver carrito de una tienda
+    Route::get('/{id_tienda}', [CarritoController::class, 'index']);
+ 
+    // Agregar producto al carrito
+    Route::post('/', [CarritoController::class, 'agregar']);
+ 
+    // Actualizar cantidad de un item
+    Route::put('/{id}', [CarritoController::class, 'actualizar']);
+ 
+    // Quitar un item
+    Route::delete('/{id}', [CarritoController::class, 'quitar']);
+ 
+    // Vaciar todo el carrito de una tienda
+    Route::delete('/vaciar/{id_tienda}', [CarritoController::class, 'vaciar']);
+ 
+    // Confirmar carrito → genera pedido
+    Route::post('/confirmar', [CarritoController::class, 'confirmar']);
+ 
 });
