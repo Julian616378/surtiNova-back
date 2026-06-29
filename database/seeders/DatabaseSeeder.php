@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
 
         $idAdmin      = DB::table('roles')->where('nombre', 'admin')->value('id');
         $idAsesor     = DB::table('roles')->where('nombre', 'asesor')->value('id');
+        $idCliente    = DB::table('roles')->where('nombre', 'cliente')->value('id');
         $idRepartidor = DB::table('roles')->where('nombre', 'repartidor')->value('id');
         $idBodeguero  = DB::table('roles')->where('nombre', 'bodeguero')->value('id');
 
@@ -49,6 +50,15 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('123456!'),
                 'estado'   => true,
                 'id_rol'   => $idAsesor,
+            ],
+            [
+                'nombre'   => 'Carlos',
+                'apellido' => 'Mendoza',
+                'correo'   => 'cliente1@surtinova.com',
+                'telefono' => '3109876543',
+                'password' => Hash::make('123456!'),
+                'estado'   => true,
+                'id_rol'   => $idCliente,
             ],
             [
                 'nombre'   => 'Laura',
