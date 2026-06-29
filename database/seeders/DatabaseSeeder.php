@@ -1,5 +1,5 @@
 <?php
-
+//php artisan db:seed DatabaseSeeder
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
