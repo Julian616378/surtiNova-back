@@ -50,26 +50,35 @@ class TiendaController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'nombre'      => 'required|string|max:255',
-            'nit'         => 'nullable|string|unique:tiendas,nit',
-            'propietario' => 'required|string|max:255',
-            'telefono'    => 'required|string|max:20',
-            'correo'      => 'nullable|email|unique:tiendas,correo',
-            'direccion'   => 'required|string',
-            'latitud'     => 'nullable|numeric',
-            'longitud'    => 'nullable|numeric',
-            'id_asesor'   => 'nullable|exists:usuarios,id',
-        ]);
+{
+    $request->validate([
+        'nombre'      => 'required|string|max:255',
+        'nit'         => 'nullable|string|unique:tiendas,nit',
+        'propietario' => 'required|string|max:255',
+        'telefono'    => 'required|string|max:20',
+        'correo'      => 'nullable|email|unique:tiendas,correo',
+        'direccion'   => 'required|string',
+        'latitud'     => 'nullable|numeric',
+        'longitud'    => 'nullable|numeric',
+    ]);
 
-        $tienda = Tienda::create(array_merge(
-            $request->only('nombre', 'nit', 'propietario', 'telefono', 'correo', 'direccion', 'latitud', 'longitud', 'id_asesor'),
-            ['estado' => 'registrada']
-        ));
+    $tienda = Tienda::create([
+        ...$request->only(
+            'nombre',
+            'nit',
+            'propietario',
+            'telefono',
+            'correo',
+            'direccion',
+            'latitud',
+            'longitud'
+        ),
+        'estado' => 'registrada',
+        'id_asesor' => $request->user()->id,
+    ]);
 
-        return response()->json($tienda->load('asesor'), 201);
-    }
+    return response()->json($tienda->load('asesor'), 201);
+}
 
     public function cambiarEstado(Request $request, Tienda $tienda)
     {
