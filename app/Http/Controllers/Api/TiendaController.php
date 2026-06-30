@@ -110,34 +110,38 @@ class TiendaController extends Controller
         return response()->json($pedidos);
     }
 
-    public function misCartera(Request $request)
-    {
-        $tiendas = Tienda::where('id_asesor', $request->user()->id)
-            ->with(['pedidos' => fn($q) => $q->latest()->limit(1)])
-            ->get();
+  public function misCartera(Request $request)
+{
+    $tiendas = Tienda::where('id_asesor', $request->user()->id)
+        ->whereHas('visitas')  // ✅ solo las que tienen al menos 1 visita
+        ->orderByDesc('created_at')
+        ->get();
 
-        return response()->json($tiendas);
-    }
-
+    return response()->json($tiendas);
+}
     public function show(Tienda $tienda)
     {
         return response()->json($tienda->load(['asesor', 'pedidos', 'muestras']));
     }
 
     public function update(Request $request, Tienda $tienda)
-    {
-        $request->validate([
-            'nombre'      => 'sometimes|string|max:255',
-            'propietario' => 'sometimes|string|max:255',
-            'telefono'    => 'sometimes|string|max:20',
-            'correo'      => "sometimes|email|unique:tiendas,correo,{$tienda->id}",
-            'direccion'   => 'sometimes|string',
-            'latitud'     => 'nullable|numeric',
-            'longitud'    => 'nullable|numeric',
-        ]);
+{
+    $request->validate([
+        'nombre'      => 'sometimes|string|max:255',
+        'propietario' => 'sometimes|string|max:255',
+        'telefono'    => 'sometimes|string|max:20',
+        'correo'      => "sometimes|email|unique:tiendas,correo,{$tienda->id}",
+        'direccion'   => 'sometimes|string',
+        'latitud'     => 'nullable|numeric',
+        'longitud'    => 'nullable|numeric',
+        'estado'      => 'sometimes|in:prospecto,registrada,en_prueba,activa,inactiva,suspendida', // ✅
+    ]);
 
-        $tienda->update($request->only('nombre', 'propietario', 'telefono', 'correo', 'direccion', 'latitud', 'longitud'));
+    $tienda->update($request->only(
+        'nombre', 'propietario', 'telefono', 'correo',
+        'direccion', 'latitud', 'longitud', 'estado' // ✅
+    ));
 
-        return response()->json($tienda);
-    }
+    return response()->json($tienda);
+}
 }

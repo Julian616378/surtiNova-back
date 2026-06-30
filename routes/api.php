@@ -39,7 +39,6 @@ use App\Http\Controllers\Api\DashboardController;
 // ─────────────────────────────────────────────────────────────────────────────
 // RUTAS PÚBLICAS (sin autenticación)
 // ─────────────────────────────────────────────────────────────────────────────
-
 Route::post('/usuarios', [UsuarioController::class, 'store']);
 Route::post('/login',            [AuthController::class, 'login']);
 Route::post('/cupones/validar',  [CuponController::class, 'validar']);
@@ -86,30 +85,29 @@ Route::middleware('auth:sanctum')->group(function () {
     // ─────────────────────────────────────────────────────────────────────────
     // ASESOR COMERCIAL
     // ─────────────────────────────────────────────────────────────────────────
-    Route::prefix('comercial')->group(function () {
-
-        // Prospectos y tiendas
-        Route::post('/prospectos',              [TiendaController::class,         'registrarProspecto']);
-        Route::post('/tiendas',                 [TiendaController::class,         'store']);
-        Route::get('/cartera',                  [TiendaController::class,         'misCartera']);
-        Route::get('/tiendas/{tienda}',         [TiendaController::class,         'show']);
-        Route::patch('/tiendas/{tienda}',       [TiendaController::class,         'update']);
-
-        // Visitas comerciales
-        Route::get('/visitas',                              [VisitaComercialController::class, 'index']);
-        Route::post('/visitas',                             [VisitaComercialController::class, 'store']);
-        Route::get('/visitas/{visita}',                     [VisitaComercialController::class, 'show']);
-        Route::patch('/visitas/{visita}/resultado',         [VisitaComercialController::class, 'registrarResultado']);
-
-        // Muestras / productos de prueba
-        Route::get('/muestras',                             [MuestraProductoController::class, 'index']);
-        Route::post('/muestras',                            [MuestraProductoController::class, 'store']);
-        Route::get('/muestras/{muestra}',                   [MuestraProductoController::class, 'show']);
-        Route::post('/muestras/{muestra}/seguimiento',      [MuestraProductoController::class, 'seguimiento']);
-
-        // Comisiones del asesor
-        Route::get('/mis-comisiones',           [ComisionController::class, 'misComisiones']);
-    });
+   Route::middleware('auth:sanctum')->prefix('comercial')->group(function () {
+     Route::get   ('cartera',          [TiendaController::class, 'misCartera']);
+    Route::post  ('prospectos',       [TiendaController::class, 'registrarProspecto']);
+    Route::post  ('tiendas',          [TiendaController::class, 'store']);
+    Route::get   ('tiendas/{tienda}', [TiendaController::class, 'show']);
+    Route::patch ('tiendas/{tienda}', [TiendaController::class, 'update']);
+ 
+    // ── Visitas ──────────────────────────────────────────────
+    // IMPORTANTE: ruta-hoy DEBE ir ANTES de {visita} para que Laravel
+    // no intente resolver "ruta-hoy" como un ID de VisitaComercial.
+    Route::get  ('visitas/ruta-hoy',           [VisitaComercialController::class, 'rutaHoy']);
+    Route::get  ('visitas',                    [VisitaComercialController::class, 'index']);
+    Route::post ('visitas',                    [VisitaComercialController::class, 'store']);
+    Route::get  ('visitas/{visita}',           [VisitaComercialController::class, 'show']);
+    Route::patch('visitas/{visita}/resultado', [VisitaComercialController::class, 'registrarResultado']);
+ 
+    // ── Muestras ─────────────────────────────────────────────
+    Route::get  ('muestras',                      [MuestraProductoController::class, 'index']);
+    Route::post ('muestras',                      [MuestraProductoController::class, 'store']);
+    Route::get  ('muestras/{muestra}',            [MuestraProductoController::class, 'show']);
+    Route::post ('muestras/{muestra}/seguimiento',[MuestraProductoController::class, 'registrarSeguimiento']);
+    Route::get('mis-comisiones', [ComisionController::class, 'misComisiones']);
+});
 
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -284,4 +282,7 @@ Route::prefix('carrito')->middleware('auth:sanctum')->group(function () {
     // Confirmar carrito → genera pedido
     Route::post('/confirmar', [CarritoController::class, 'confirmar']);
  
+
+
+
 });

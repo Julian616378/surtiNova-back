@@ -15,9 +15,17 @@ class VisitaComercial extends Model
         'id_asesor',
         'id_tienda',
         'fecha',
-        'resultado',
+        'resultado',            // columna vieja (se mantiene por compatibilidad)
+        'resultado_visita',     // columna nueva: registrada|no_acepto|no_estaba|muestra_entregada
         'observaciones',
         'proxima_visita',
+        // campos de prospecto suelto (sin tienda aún)
+        'nombre_prospecto',
+        'telefono_prospecto',
+        'direccion_prospecto',
+        'latitud_prospecto',
+        'longitud_prospecto',
+        'id_muestra',
     ];
 
     protected $casts = [
@@ -33,5 +41,10 @@ class VisitaComercial extends Model
     public function tienda()
     {
         return $this->belongsTo(Tienda::class, 'id_tienda');
+    }
+
+    public function muestra()
+    {
+        return $this->belongsTo(MuestraProducto::class, 'id_muestra');
     }
 }

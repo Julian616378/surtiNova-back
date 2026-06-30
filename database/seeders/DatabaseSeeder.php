@@ -439,5 +439,9 @@ class DatabaseSeeder extends Seeder
             ['placa' => 'DEF-789', 'tipo' => 'Motocicleta','capacidad' => 50,   'estado' => true],
             ['placa' => 'GHI-001', 'tipo' => 'Camión',     'capacidad' => 3000, 'estado' => false],
         ]);
+            $this->call([
+        // ...tus otros seeders...
+        RutaDemoSeeder::class,
+    ]);
     }
 }
